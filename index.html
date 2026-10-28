@@ -966,7 +966,7 @@ function fbInfo(){const m=meta[idx]||{},sec=(m.kind||m.files||m.file||(hist[idx]
  return {section:sec,view:$('stage').dataset.v==='code'?'الرمز':'المعاينة',theme:document.documentElement.dataset.theme==='dark'?'داكن':'فاتح',screen:innerWidth+'×'+innerHeight,device:navigator.userAgent}}
 async function fbPostJson(fields){const r=await fetch('https://formsubmit.co/ajax/'+FB_TO,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(fields)});
  const j=await r.json().catch(()=>({}));if(r.ok&&(j.success===true||j.success==='true'))return true;
- return /activat/i.test(j.message||'')?'فعّل بريدك أولًا: افتح رسالة FormSubmit في بريدك واضغط تفعيل':false}
+ return false}
 function fbPostForm(fields){return new Promise(res=>{const fr=$('fbframe'),f=document.createElement('form');f.method='POST';f.action='https://formsubmit.co/'+FB_TO;f.enctype='multipart/form-data';f.target='fbframe';f.hidden=true;
  for(const k in fields){const i=document.createElement('input');i.type='hidden';i.name=k;i.value=fields[k];f.append(i)}
  const fi=document.createElement('input');fi.type='file';fi.name='attachment';fi.multiple=true;const dt=new DataTransfer();fbFiles.forEach(x=>dt.items.add(x));fi.files=dt.files;f.append(fi);
