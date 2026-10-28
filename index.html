@@ -948,7 +948,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape')closeHist()});
 
 /* ===== ملاحظاتك: إرسال ملاحظة إلى بريدك عبر FormSubmit ===== */
 /* ضع هنا بريدك (لأول اختبار) ثم بعد تفعيله استبدله بالمعرف العشوائي الذي يرسله لك FormSubmit */
-const FB_TO='ضع-بريدك-هنا';
+const FB_TO='Khataryvall@gmail.com';
 const FB_MAX=9.5*1048576,fbFiles=[];
 function fbList(){const box=$('fbfiles');box.replaceChildren();fbFiles.forEach((f,i)=>{const r=document.createElement('div'),n=document.createElement('span'),x=document.createElement('button');r.className='fbf';n.textContent=f.name;n.dir='auto';x.type='button';x.className='fbx';x.setAttribute('aria-label','إزالة');x.textContent='×';x.onclick=()=>{fbFiles.splice(i,1);fbList()};r.append(n,x);box.append(r)})}
 const fbShow=v=>{$('fbform').hidden=!v;$('fbthx').hidden=v};
