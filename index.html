@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>قالب معاينة التطبيقات</title>
+<script>try{if(self!==top)document.documentElement.classList.add('emb')}catch(e){document.documentElement.classList.add('emb')}</script>
 <style>
 :root{--bg:#f8f9fa;--card:#fff;--ink:#1f1f1f;--mute:#5f6368;--pill:#edf0f4;--hover:#00000012;--line:#e3e6ea;color-scheme:light}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -199,6 +200,9 @@ body.dragging .card{outline:2px dashed #1a73e8;outline-offset:-8px}
 /* بطاقات الشعارات المتحركة: لا يمكن لمسها أو تحديدها أو سحبها */
 .scene,.scene *{pointer-events:none!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
 .tw{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* لمس البطاقات لا يفعل شيئًا: الحاوية تمتص اللمس (بلا نسخ/لصق/بحث) والتمرير العمودي يعمل */
+.scene{pointer-events:auto!important;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;cursor:default}
+.empty,.empty *:not(button):not(button *){-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .fc{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .scene{transition:opacity .5s}.scene.dh{opacity:0}
 html[data-theme=dark] .dcode{color:#cbd5e1}html[data-theme=dark] .dpb{background:#ffffff18}
@@ -207,6 +211,26 @@ html[data-theme=dark] .dcode{color:#cbd5e1}html[data-theme=dark] .dpb{background
 @container (max-width:285px){.card .pcard .pa .ib.lb:not(.sq) span{display:none}.card .pcard .pa .ib.lb:not(.sq){padding:0 7px}}
 html[data-ldir=ltr] .fb .pb textarea{direction:ltr;text-align:left}
 html[data-ldir=ltr] .card .bar>.ib.lb:not(.only){font-size:.82em}
+button,.ib,[role=tab],[role=button],.chip2,.row2,.tile{touch-action:manipulation}
+html[data-ldir=ltr] .arc,html[data-ldir=ltr] .tw{direction:ltr}
+/* ===== تكيّف تلقائي مع أي مكان يُفتح فيه القالب ===== */
+/* أزرار الأيقونة وحدها (الهاتف، اللغة، الملاحظات): دوائر كاملة شفافة بدل المستطيل */
+.card .bar>.ib.lb.only,.card .ib.lb.only{width:2.9em!important;min-width:2.9em!important;max-width:2.9em!important;height:2.9em!important;min-height:2.9em!important;max-height:2.9em!important;aspect-ratio:1/1;padding:0!important;border-radius:50%!important;align-self:center!important;justify-self:center;flex:0 0 auto!important;display:grid!important;place-items:center;margin:0!important}
+.card .ib.lb.only svg{margin:0!important}
+/* زر «لصق الكود»: نفس شكل أزرار الشريط (حبة أفقية: أيقونة الحافظة + الكلمة بجانبها) */
+.card .pcard .ib.lb.pe{flex-direction:row!important;width:auto!important;min-width:0!important;height:2.8em!important;padding:0 1.1em 0 .8em!important;gap:.45em!important;border-radius:999px!important;font-size:15px!important;white-space:nowrap;text-align:start;align-items:center;justify-content:center}
+.card .pcard .ib.lb.pe svg{width:1.6em!important;height:1.6em!important;flex:none}
+.card .pcard .ib.lb.pe>span{display:inline!important;overflow:visible}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+@supports (height:100dvh){.card .stage{min-height:100dvh}.card .stage iframe{height:100dvh;min-height:100dvh}.media{min-height:100dvh}}
+html.emb,html.emb body{height:100%;background:transparent}
+html.emb .msg{display:none}
+html.emb .card{margin:0;border-radius:0;box-shadow:none}
+@media (max-height:480px) and (orientation:landscape){.msg{display:none}.card{margin-top:8px;margin-bottom:16px}}
+@media (max-width:360px){.card{margin-inline:0;border-radius:18px}}
+@media (min-width:900px){.card{border-radius:24px}}
+html[data-ldir=ltr] .tab .ib.lb span,html[data-ldir=ltr] .tabs.pj .ib.lb span,html[data-ldir=ltr] .tabs.solo .ib.lb span{direction:ltr}
 #cloud .ck{display:none}#cloud.saved .ck{display:inline}
 .pj{position:absolute;inset:0;z-index:7;background:#fff;overflow:auto;padding:14px 14px 28px}
 .pj .hh{display:flex;align-items:center;justify-content:space-between;max-width:640px;margin:0 auto;padding:4px 6px 12px;font-size:17px}
@@ -291,7 +315,7 @@ html[data-ldir=ltr] .card .bar>.ib.lb:not(.only){font-size:.82em}
 .card .tabs.pj .ib.lb{height:34px;font-size:13px;padding:0 12px 0 10px;gap:5px;margin:0;font-weight:600;color:var(--ink)}
 .card .tabs.pj .ib.lb svg{width:18px;height:18px}
 .tabs.pj .ib.lb span{overflow:visible;direction:rtl}
-.pcard{--ac:#5f6b7a;align-self:start;min-width:0;height:min(100%,560px);scroll-snap-align:start;filter:drop-shadow(0 10px 16px #1d3f9324) drop-shadow(0 2px 4px #00000018);transition:transform .2s,filter .2s}
+.pcard{--ac:#5f6b7a;align-self:start;min-width:0;height:min(100%,560px);scroll-snap-align:start;filter:drop-shadow(0 10px 16px #1d3f9324) drop-shadow(0 2px 4px #00000018);transition:transform .2s}
 .pcard.cur{transform:translateY(-6px);filter:drop-shadow(0 16px 22px #1d3f9338) drop-shadow(0 2px 5px #0000001f)}
 .pcard .pin{position:relative;height:100%;display:flex;flex-direction:column;border-radius:18px;background:linear-gradient(180deg,#fff,#f2f4f8);clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,0 100%);overflow:hidden}
 .pcard .pin::after{content:"";position:absolute;top:0;right:0;width:26px;height:26px;background:linear-gradient(225deg,transparent 50%,#d6dce6 50%);border-bottom-left-radius:5px;pointer-events:none}
@@ -708,11 +732,11 @@ function csvRows(t,d){const rows=[];let r=[],c='',q=false;for(let i=0;i<t.length
  if(c||r.length){r.push(c);rows.push(r)}return rows}
 function csvTable(t){const f=t.split('\n')[0]||'',cnt=ch=>f.split(ch).length;const d=cnt('\t')>cnt(',')&&cnt('\t')>cnt(';')?'\t':cnt(';')>cnt(',')?';':',';
  const rows=csvRows(t,d);if(!rows.length)return '';const body=rows.slice(1,2001);
- return '<div style="overflow:auto"><table><thead><tr>'+rows[0].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+body.map(r=>'<tr>'+r.map(x=>'<td>'+esc(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'+(rows.length>2001?'<p class="n">يعرض أول 2000 صف من '+(rows.length-1)+'</p>':'<p class="n">'+(rows.length-1)+' صف</p>')}
+ return '<div style="overflow:auto"><table><thead><tr>'+rows[0].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+body.map(r=>'<tr>'+r.map(x=>'<td>'+esc(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'+(rows.length>2001?'<p class="n">'+GT('يعرض أول 2000 صف من ')+(rows.length-1)+'</p>':'<p class="n">'+(rows.length-1)+GT(' صف')+'</p>')}
 function wrap(k,t){if(!t.trim()||!k||k==='html')return t;
  if(k==='svg')return HEAD+'<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#fff">'+t;
  if(k==='js')return HEAD+'<body><scr'+'ipt>'+t.replace(/<\/script/gi,'<\\/script')+'<\/script>';
- if(k==='css')return HEAD+'<style>'+t+'</style><body style="font-family:system-ui;padding:16px"><h1>عنوان رئيسي</h1><h2>عنوان فرعي</h2><p>فقرة نصية <a href="#">رابط</a> <b>نص عريض</b></p><button>زر</button> <input placeholder="حقل إدخال"><ul><li>عنصر</li><li>عنصر</li></ul>';
+ if(k==='css')return HEAD+'<style>'+t+'</style><body style="font-family:system-ui;padding:16px"><h1>'+GT('عنوان رئيسي')+'</h1><h2>'+GT('عنوان فرعي')+'</h2><p>'+GT('فقرة نصية')+' <a href="#">'+GT('رابط')+'</a> <b>'+GT('نص عريض')+'</b></p><button>'+GT('زر')+'</button> <input placeholder="'+GT('حقل إدخال')+'"><ul><li>'+GT('عنصر')+'</li><li>'+GT('عنصر')+'</li></ul>';
  if(k==='md')return HEAD+DOC+'<body dir="auto">'+md(t);
  if(k==='csv')return HEAD+DOC+'<body dir="auto">'+csvTable(t);
  let x=t;if(k==='json'){try{x=JSON.stringify(JSON.parse(t),null,2)}catch(e){}}
@@ -843,7 +867,8 @@ $('dev').onclick=e=>{e.stopPropagation();dm.hidden?openDMenu():closeDMenu()};
 document.addEventListener('click',e=>{if(!dm.hidden&&!dm.contains(e.target))closeDMenu()});
 addEventListener('keydown',e=>{if(e.key==='Escape')closeDMenu()});
 addEventListener('scroll',closeDMenu,{passive:true});
-addEventListener('resize',fit);document.addEventListener('fullscreenchange',applyDev);
+{let rz=0;addEventListener('resize',()=>{if(rz)return;rz=requestAnimationFrame(()=>{rz=0;fit()})},{passive:true})}
+document.addEventListener('fullscreenchange',applyDev);
 /* في وضع ملء الشاشة الحقيقي لا يُعرض إلا ما بداخل العنصر الممتد، فننقل القوائم والتنبيه إليه */
 function hostMenus(){const h=document.fullscreenElement||document.body;[dm,am,$('toast')].forEach(e=>{if(e&&e.parentNode!==h)h.append(e)})}
 document.addEventListener('fullscreenchange',hostMenus);
@@ -928,7 +953,7 @@ async function cloudDone(manual){const r=await save();$('cloud').querySelector('
  if(r==='ok')$('cloud').classList.add('saved');if(r==='ok'&&!$('hist').hidden)renderHist()}
 $('cloud').onclick=()=>{cloudBusy();setTimeout(()=>cloudDone(true),350)};
 /* ===== سجلات المعاينة ===== */
-const fmtDate=t=>{const d=new Date(t),o={day:'numeric',month:'long',hour:'numeric',minute:'2-digit'};if(d.getFullYear()!==new Date().getFullYear())o.year='numeric';try{return d.toLocaleString('ar-u-nu-latn',o)}catch(e){return d.toLocaleString()}};
+const fmtDate=t=>{const d=new Date(t),o={day:'numeric',month:'long',hour:'numeric',minute:'2-digit'};if(d.getFullYear()!==new Date().getFullYear())o.year='numeric';try{return d.toLocaleString((typeof LANG==='string'&&LANG!=='ar'?LANG:'ar')+'-u-nu-latn',o)}catch(e){return d.toLocaleString()}};
 const closeHist=()=>{$('hist').hidden=true};
 function openRec(r){const m={kind:r.kind,label:r.label,name:r.name,fname:r.fname,hl:r.hl,logo:r.logo};if(r.bd!==undefined)m.bd=r.bd;if(r.files)m.files=r.files;if(r.imgs)m.imgs=r.imgs;if(r.blob){m.file=r.blob;m.url=URL.createObjectURL(r.blob)}
  if(r.arcBlob){m.arcId=ARC.reopen(r);m.arcEntry=r.arcEntry}commit(r.text||'',m);render(true);view('prev');closeHist();$('cloud').classList.add('saved');toast('تم فتح السجل')}
@@ -1072,15 +1097,323 @@ const LD=`معاينة|Preview|Aperçu
 ^تم تنزيل|Downloaded|Téléchargé`;
 const TX={},PX={};LANGS.slice(1).forEach(l=>{TX[l[0]]={};PX[l[0]]={}});
 LD.split('\n').forEach(r=>{const p=r.split('|'),pre=p[0][0]==='^',k=pre?p[0].slice(1):p[0];LANGS.slice(1).forEach((l,i)=>{(pre?PX:TX)[l[0]][k]=p[i+1]})});
+/* ===== ترجمة إضافية: مستكشف الأرشيف (ZIP/APK) والتقارير والرسائل الديناميكية ===== */
+const LD2=`=ملف|File|Fichier
+=مجلد|Folder|Dossier
+=لا|No|Non
+=نعم|Yes|Oui
+يعرض أول 2000 صف من|Showing the first 2000 rows of|Affichage des 2000 premières lignes sur
+~صف|rows|lignes
+عنوان رئيسي|Main heading|Titre principal
+عنوان فرعي|Subheading|Sous-titre
+فقرة نصية|Text paragraph|Paragraphe de texte
+~رابط|link|lien
+نص عريض|Bold text|Texte en gras
+~زر|button|bouton
+حقل إدخال|Input field|Champ de saisie
+~عنصر|items|éléments
+~ث|s|s
+~صفحة|pages|pages
+جارٍ تحميل ملف PDF...|Loading PDF…|Chargement du PDF…
+تعذر عرض ملف PDF داخل الصفحة|Couldn't display the PDF inside the page|Impossible d'afficher le PDF dans la page
+فتح الملف في تبويب جديد|Open file in a new tab|Ouvrir le fichier dans un nouvel onglet
+تعذر قراءة الخط|Couldn't read the font|Impossible de lire la police
+هذا النوع من الملفات لا يحتوي كودًا نصيًا|This file type has no text code|Ce type de fichier ne contient pas de code texte
+المعاينة|Preview|Aperçu
+مشروع HTML|HTML project|Projet HTML
+~مشروع|Project|Projet
+تم دمج|Merged|Fusion de
+في معاينة واحدة|into one preview|en un seul aperçu
+~ملفات|files|fichiers
+~ملف|files|fichiers
+~تجاهلت|skipped|ignorés
+~غير مدعوم|unsupported|non pris en charge
+لا يمكن إضافة ملفات فوق هذا النوع|Can't add files on top of this type|Impossible d'ajouter des fichiers à ce type
+الإضافة متاحة مع ملفات HTML وCSS وJS فقط|Adding is only available with HTML, CSS and JS files|L'ajout n'est possible qu'avec des fichiers HTML, CSS et JS
+جارٍ التحميل…|Loading…|Chargement…
+~مورد|resources|ressources
+~الحزم|packages|paquets
+~تم اقتصار القائمة|list truncated|liste tronquée
+~فئة|classes|classes
+~دالة|methods|méthodes
+~حقل|fields|champs
+~نص|strings|chaînes
+الصيغة|Format|Format
+المعمارية|Architecture|Architecture
+النوع|Type|Type
+الحجم|Size|Taille
+الكاميرا|Camera|Caméra
+تسجيل الصوت|Record audio|Enregistrement audio
+قراءة جهات الاتصال|Read contacts|Lire les contacts
+تعديل جهات الاتصال|Modify contacts|Modifier les contacts
+قراءة الحسابات|Read accounts|Lire les comptes
+قراءة التقويم|Read calendar|Lire l'agenda
+تعديل التقويم|Modify calendar|Modifier l'agenda
+الموقع الدقيق|Precise location|Position précise
+الموقع التقريبي|Approximate location|Position approximative
+الموقع في الخلفية|Background location|Position en arrière-plan
+حالة الهاتف والرقم|Phone state and number|État et numéro du téléphone
+قراءة أرقام الهاتف|Read phone numbers|Lire les numéros de téléphone
+إجراء مكالمات|Make calls|Passer des appels
+سجل المكالمات|Call log|Journal d'appels
+تعديل سجل المكالمات|Modify call log|Modifier le journal d'appels
+الرد على المكالمات|Answer calls|Répondre aux appels
+إرسال رسائل SMS|Send SMS|Envoyer des SMS
+استقبال رسائل SMS|Receive SMS|Recevoir des SMS
+قراءة رسائل SMS|Read SMS|Lire les SMS
+استقبال MMS|Receive MMS|Recevoir des MMS
+قراءة التخزين|Read storage|Lire le stockage
+الكتابة في التخزين|Write to storage|Écrire dans le stockage
+قراءة الصور|Read images|Lire les images
+قراءة الفيديو|Read video|Lire les vidéos
+قراءة الصوتيات|Read audio|Lire l'audio
+إرسال إشعارات|Send notifications|Envoyer des notifications
+مستشعرات الجسم|Body sensors|Capteurs corporels
+التعرّف على النشاط|Activity recognition|Reconnaissance d'activité
+اتصال بلوتوث|Bluetooth connect|Connexion Bluetooth
+فحص بلوتوث|Bluetooth scan|Analyse Bluetooth
+أجهزة Wi-Fi القريبة|Nearby Wi-Fi devices|Appareils Wi-Fi à proximité
+الاتصال بالإنترنت|Internet access|Accès à Internet
+حالة الشبكة|Network state|État du réseau
+حالة Wi-Fi|Wi-Fi state|État du Wi-Fi
+تغيير Wi-Fi|Change Wi-Fi|Modifier le Wi-Fi
+بلوتوث|Bluetooth|Bluetooth
+الاهتزاز|Vibration|Vibration
+منع السكون|Keep awake|Empêcher la veille
+التشغيل عند الإقلاع|Run at startup|Lancement au démarrage
+خدمة أمامية|Foreground service|Service au premier plan
+العرض فوق التطبيقات|Display over other apps|Affichage par-dessus les apps
+تثبيت تطبيقات|Install apps|Installer des applications
+إدارة كل الملفات|Manage all files|Gérer tous les fichiers
+تعديل إعدادات النظام|Modify system settings|Modifier les réglages système
+رؤية كل التطبيقات|See all apps|Voir toutes les applications
+خدمة إمكانية الوصول|Accessibility service|Service d'accessibilité
+قراءة سجلات النظام|Read system logs|Lire les journaux système
+ضمني|Implicit|Implicite
+تقرير تحليل APK|APK analysis report|Rapport d'analyse APK
+اسم التطبيق|App name|Nom de l'appli
+الحزمة (Package)|Package|Package
+الإصدار|Version|Version
+~كود|code|code
+أدنى إصدار أندرويد|Minimum Android version|Version Android minimale
+الإصدار المستهدف|Target version|Version cible
+إصدار الترجمة|Compile version|Version de compilation
+النشاط الرئيسي|Main activity|Activité principale
+حجم الملف|File size|Taille du fichier
+عدد الملفات|File count|Nombre de fichiers
+قابل للتنقيح (debuggable)|Debuggable|Débogable
+نعم ⚠|Yes ⚠|Oui ⚠
+النسخ الاحتياطي|Backup|Sauvegarde
+معطّل|Disabled|Désactivée
+مسموح|Allowed|Autorisée
+حركة HTTP غير مشفّرة|Cleartext HTTP traffic|Trafic HTTP non chiffré
+مسموحة ⚠|Allowed ⚠|Autorisé ⚠
+غير مفعّلة صراحة|Not explicitly enabled|Non activé explicitement
+أكواد DEX|DEX code|Code DEX
+تجاوز حد 64K|exceeds the 64K limit|dépasse la limite de 64K
+ملاحظة: أسماء الفئات قصيرة، يبدو أن الكود مُشوَّش (ProGuard/R8)|Note: class names are short; the code appears obfuscated (ProGuard/R8)|Remarque : les noms de classes sont courts ; le code semble obfusqué (ProGuard/R8)
+المكتبات الأصلية (Native)|Native libraries|Bibliothèques natives
+~مكتبة|libraries|bibliothèques
+الصلاحيات|Permissions|Autorisations
+~لا توجد|none|aucune
+الأنشطة|Activities|Activités
+الخدمات|Services|Services
+المستقبِلات|Receivers|Récepteurs
+المزوّدات|Providers|Fournisseurs
+~مصدَّر|exported|exporté
+★ رئيسي|★ main|★ principal
+الميزات المطلوبة|Required features|Fonctionnalités requises
+إلزامي|required|obligatoire
+اختياري|optional|facultatif
+مكتبات مشتركة|Shared libraries|Bibliothèques partagées
+التوقيع|Signature|Signature
+مخطط v1 (JAR)|Scheme v1 (JAR)|Schéma v1 (JAR)
+مخطط v2|Scheme v2|Schéma v2
+مخطط v3|Scheme v3|Schéma v3
+موجود|Present|Présent
+غير موجود|Absent|Absent
+شهادة|Certificate|Certificat
+المالك|Owner|Propriétaire
+الجهة المصدِرة|Issuer|Émetteur
+موقّعة ذاتيًا|self-signed|auto-signé
+الرقم التسلسلي|Serial number|Numéro de série
+صالحة|Valid|Valide
+الخوارزمية|Algorithm|Algorithme
+المفتاح|Key|Clé
+ملاحظة|Note|Remarque
+يُعرض وجود التوقيع وبياناته فقط، ولا يُتحقَّق من صحته تشفيريًا داخل المتصفح.|Only the signature's presence and data are shown; it isn't cryptographically verified in the browser.|Seules la présence de la signature et ses données sont affichées ; elle n'est pas vérifiée cryptographiquement dans le navigateur.
+ملف XML ثنائي — تم فك ترميزه إلى نص|Binary XML file — decoded to text|Fichier XML binaire — décodé en texte
+جدول الموارد الثنائي — تم فك ترميزه|Binary resource table — decoded|Table de ressources binaire — décodée
+ملف DEX — قائمة الفئات والدوال والحقول|DEX file — list of classes, methods and fields|Fichier DEX — liste des classes, méthodes et champs
+شهادة التوقيع|Signing certificate|Certificat de signature
+مكتبة أصلية (ELF)|Native library (ELF)|Bibliothèque native (ELF)
+ويب|Web|Web
+صور|Images|Images
+وسائط|Media|Médias
+خطوط|Fonts|Polices
+مستندات|Documents|Documents
+أكواد|Code|Code
+أرشيفات|Archives|Archives
+أخرى|Other|Autres
+تقارير التحليل|Analysis reports|Rapports d'analyse
+المانيفست|Manifest|Manifeste
+كود التطبيق (DEX)|App code (DEX)|Code de l'appli (DEX)
+جدول الموارد|Resource table|Table de ressources
+مكتبات أصلية (Native)|Native libraries|Bibliothèques natives
+صور وأيقونات|Images & icons|Images et icônes
+واجهات وموارد XML|Layouts & XML resources|Interfaces et ressources XML
+خطوط وصوتيات وخام|Fonts, audio & raw|Polices, audio et brut
+الأصول (assets)|Assets|Assets
+التوقيع (META-INF)|Signature (META-INF)|Signature (META-INF)
+تعذر فتح الصفحة|Couldn't open the page|Impossible d'ouvrir la page
+غير موقَّع|Unsigned|Non signé
+~موقَّع|Signed|Signé
+شهادة تنقيح (Debug)|Debug certificate|Certificat de débogage
+قابل للتنقيح|Debuggable|Débogable
+HTTP غير مشفّر مسموح|Cleartext HTTP allowed|HTTP non chiffré autorisé
+كود مُشوَّش (R8/ProGuard)|Obfuscated code (R8/ProGuard)|Code obfusqué (R8/ProGuard)
+DEX تجاوز حد 64K|DEX exceeds 64K limit|DEX dépasse la limite de 64K
+مكوّن مصدَّر بلا حماية|exported component without protection|composant exporté sans protection
+صلاحية حسّاسة|sensitive permission|autorisation sensible
+المعماريات|Architectures|Architectures
+بلا مكتبات أصلية|No native libraries|Aucune bibliothèque native
+المكوّنات|Components|Composants
+~نشاط|Activity|Activité
+~خدمة|Service|Service
+~مستقبِل|Receiver|Récepteur
+~مزوّد|Provider|Fournisseur
+التقرير الكامل|Full report|Rapport complet
+المانيفست المفكوك|Decoded manifest|Manifeste décodé
+الموارد المفكوكة|Decoded resources|Ressources décodées
+بيانات التطبيق|App data|Données de l'appli
+الحزمة|Package|Package
+كود الإصدار|Version code|Code de version
+أدنى إصدار|Minimum version|Version minimale
+فئة Application|Application class|Classe Application
+نسخ احتياطي|Backup|Sauvegarde
+HTTP غير مشفّر|Cleartext HTTP|HTTP non chiffré
+ذاكرة كبيرة|Large heap|Grande mémoire
+تسريع العتاد|Hardware acceleration|Accélération matérielle
+دعم RTL|RTL support|Prise en charge RTL
+استخراج المكتبات|Extract native libs|Extraction des bibliothèques
+إعدادات أمان الشبكة|Network security config|Configuration de sécurité réseau
+السمة|Theme|Thème
+معرّف المستخدم المشترك|Shared user ID|ID utilisateur partagé
+موقع التثبيت|Install location|Emplacement d'installation
+لا توجد صلاحيات مطلوبة|No permissions requested|Aucune autorisation demandée
+⛔ خطيرة|⛔ Dangerous|⛔ Dangereuse
+⚠ حسّاسة|⚠ Sensitive|⚠ Sensible
+عادية|Normal|Normale
+غير معروفة / مخصّصة|Unknown / custom|Inconnue / personnalisée
+صلاحيات يعرّفها التطبيق|Permissions defined by the app|Autorisations définies par l'appli
+مستوى الحماية|Protection level|Niveau de protection
+★ نقطة الدخول|★ Entry point|★ Point d'entrée
+~صلاحية|permissions|autorisations
+الميزات والمكتبات المشتركة|Features & shared libraries|Fonctionnalités et bibliothèques partagées
+الميزات (uses-feature)|Features (uses-feature)|Fonctionnalités (uses-feature)
+إلزامية|Required|Requise
+اختيارية|Optional|Facultative
+مكتبات مشتركة (uses-library)|Shared libraries (uses-library)|Bibliothèques partagées (uses-library)
+كود DEX والحزم|DEX code & packages|Code DEX et paquets
+أسماء الفئات قصيرة جدًا، الأرجح أن الكود مُشوَّش بـ R8/ProGuard.|Class names are very short; the code is likely obfuscated with R8/ProGuard.|Les noms de classes sont très courts ; le code est probablement obfusqué avec R8/ProGuard.
+أكبر الحزم (حسب عدد الفئات)|Largest packages (by class count)|Plus grands paquets (par nombre de classes)
+~حزمة أخرى|more packages|autres paquets
+~… و|… and |… et 
+افتح ملف DEX من فئة «كود التطبيق» لعرض القائمة الكاملة|Open the DEX file from the “App code” category to see the full list|Ouvrez le fichier DEX de la catégorie « Code de l'appli » pour voir la liste complète
+التوقيع والشهادات|Signature & certificates|Signature et certificats
+الشهادة|Certificate|Certificat
+تبدأ|Starts|Début
+تنتهي|Ends|Fin
+خوارزمية التوقيع|Signature algorithm|Algorithme de signature
+الموارد (resources.arsc)|Resources (resources.arsc)|Ressources (resources.arsc)
+اللغات المتوفرة|Available languages|Langues disponibles
+افتح _decoded/resources.txt لعرض كل النصوص والألوان والمسارات.|Open _decoded/resources.txt to see all strings, colors and paths.|Ouvrez _decoded/resources.txt pour voir tous les textes, couleurs et chemins.
+جارٍ فك الضغط…|Extracting…|Décompression…
+الأرشيف كبير جدًا على المتصفح (الحد 400MB)|Archive too large for the browser (400MB limit)|Archive trop volumineuse pour le navigateur (limite 400 Mo)
+عدة ملفات|Several files|Plusieurs fichiers
+~مجلد|folders|dossiers
+جارٍ تحليل APK…|Analyzing APK…|Analyse de l'APK…
+الأرشيف فارغ|The archive is empty|L'archive est vide
+الملف مشفّر بكلمة مرور ولا يمكن فتحه|The file is password-protected and can't be opened|Le fichier est protégé par mot de passe et ne peut pas être ouvert
+طريقة الضغط داخل الملف غير مدعومة|The compression method inside the file isn't supported|La méthode de compression du fichier n'est pas prise en charge
+تم تحليل APK|APK analyzed|APK analysé
+تم فك|Extracted|Extraction de
+ملف وتنظيمها في|files and organized into|fichiers, organisés en
+~فئات|categories|catégories
+~ملف نظام/تبعيات|system/dependency files|fichiers système/dépendances
+~ملف نظام|system files|fichiers système
+ملف مشفّر/تالف|encrypted/corrupted files|fichiers chiffrés/corrompus
+~تخطّيت|skipped|ignorés
+~صيغة|Format|Format
+~غير مدعومة داخل المتصفح بدون مكتبات، حوّلها إلى|isn't supported in the browser without libraries; convert it to|non pris en charge dans le navigateur sans bibliothèques ; convertissez-le en
+~أو|or|ou
+تعذر فك هذا الأرشيف (قد يكون تالفًا)|Couldn't extract this archive (it may be corrupted)|Impossible d'extraire cette archive (elle est peut-être corrompue)
+الأرشيف|Archive|Archive
+بحث|Search|Rechercher
+ابحث في الملفات…|Search files…|Rechercher dans les fichiers…
+عرض المعاينة|Show preview|Afficher l'aperçu
+حسب المجلد|By folder|Par dossier
+حسب النوع|By type|Par type
+تنزيل منظَّم|Organized download|Téléchargement organisé
+تنزيل الكل|Download all|Tout télécharger
+الكل|All|Tout
+مشفّر|Encrypted|Chiffré
+=غير مدعوم|Unsupported|Non pris en charge
+تنزيل|Download|Télécharger
+لا توجد نتائج مطابقة|No matching results|Aucun résultat correspondant
+لا توجد ملفات|No files|Aucun fichier
+المجلد الرئيسي|Root folder|Dossier racine
+تنزيل المجموعة|Download group|Télécharger le groupe
+عرض المزيد|Show more|Afficher plus
+الملف مشفّر|The file is encrypted|Le fichier est chiffré
+الملف كبير جدًا|File too large|Fichier trop volumineux
+تعذر استخراج الملف|Couldn't extract the file|Impossible d'extraire le fichier
+الحجم كبير على المتصفح، نزّل مجموعة أصغر|Size is too large for the browser; download a smaller set|Taille trop grande pour le navigateur ; téléchargez un groupe plus petit
+جارٍ تجهيز الملف المضغوط…|Preparing the archive…|Préparation de l'archive…
+لا توجد ملفات قابلة للاستخراج|No extractable files|Aucun fichier extractible
+تم التنزيل|Downloaded|Téléchargé
+تعذر إنشاء الملف المضغوط|Couldn't create the archive|Impossible de créer l'archive
+هذا الملف مشفّر بكلمة مرور، لا يمكن عرضه أو استخراجه داخل المتصفح.|This file is password-protected and can't be viewed or extracted in the browser.|Ce fichier est protégé par mot de passe et ne peut pas être affiché ni extrait dans le navigateur.
+طريقة الضغط المستخدمة لهذا الملف غير مدعومة.|The compression method used for this file isn't supported.|La méthode de compression de ce fichier n'est pas prise en charge.
+الملف كبير جدًا للعرض داخل المتصفح.|The file is too large to display in the browser.|Le fichier est trop volumineux pour être affiché dans le navigateur.
+تنبيه: فشل فحص سلامة هذا الملف (CRC).|Warning: this file failed the integrity check (CRC).|Attention : ce fichier a échoué à la vérification d'intégrité (CRC).
+عُرض أول 400KB فقط، نزّل الملف المفكوك من فئة «تقارير التحليل» لقراءته كاملًا.|Only the first 400KB is shown; download the decoded file from the “Analysis reports” category to read it in full.|Seuls les 400 premiers Ko sont affichés ; téléchargez le fichier décodé depuis la catégorie « Rapports d'analyse » pour le lire en entier.
+فتح PDF في تبويب جديد|Open PDF in a new tab|Ouvrir le PDF dans un nouvel onglet
+فتح هذا الأرشيف|Open this archive|Ouvrir cette archive
+معاينة هذه الصفحة|Preview this page|Aperçu de cette page
+عُرض أول 400KB فقط، نزّل الملف لقراءته كاملًا.|Only the first 400KB is shown; download the file to read it in full.|Seuls les 400 premiers Ko sont affichés ; téléchargez le fichier pour le lire en entier.
+لا توجد معاينة لهذا النوع، يمكنك تنزيله.|No preview for this type; you can download it.|Pas d'aperçu pour ce type ; vous pouvez le télécharger.
+الملف مشفّر.|The file is encrypted.|Le fichier est chiffré.
+تعذر استخراج هذا الملف (قد يكون تالفًا).|Couldn't extract this file (it may be corrupted).|Impossible d'extraire ce fichier (il est peut-être corrompu).
+الرابط غير موجود داخل الأرشيف|The link isn't inside the archive|Le lien est introuvable dans l'archive
+^تم لصق الكود في|Code pasted in|Code collé dans
+المس البطاقة والصق الكود يدويًا|Tap the card and paste the code manually|Touchez la carte et collez le code manuellement
+توسيع البطاقة|Expand card|Agrandir la carte
+تصغير البطاقة|Collapse card|Réduire la carte
+معاينة التطبيق|App preview|Aperçu de l'application
+أدوات المعاينة|Preview tools|Outils d'aperçu`;
+const PHM={};LANGS.slice(1).forEach(l=>{PHM[l[0]]=new Map()});
+LD2.split('\n').forEach(r=>{if(!r.trim())return;const p=r.split('|');let k=p[0],mode=0;
+ if(k[0]==='~'){mode=1;k=k.slice(1)}else if(k[0]==='='){mode=2;k=k.slice(1)}else if(k[0]==='^'){mode=3;k=k.slice(1)}
+ LANGS.slice(1).forEach((l,i)=>{const c=l[0],v=p[i+1];if(mode===3){PX[c][k]=v;return}if(mode!==1)TX[c][k]=v;if(mode!==2)PHM[c].set(k,v)})});
+const ARL='\u0621-\u065F\u0671-\u06D3',RXM={};
+function phrRx(c){if(RXM[c])return RXM[c];const ks=[...PHM[c].keys()].sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&'));
+ return RXM[c]=new RegExp('(^|[^'+ARL+'])('+ks.join('|')+')(?![' +ARL+'])','g')}
+function phr(v,c){const m=PHM[c];if(!m||!/[\u0600-\u06FF]/.test(v))return v;return v.replace(phrRx(c),(x,a,b)=>a+m.get(b))}
+function GT(v){return(typeof v==='string'&&typeof LANG==='string'&&LANG!=='ar'&&TX[LANG])?phr(v,LANG):v}
 let LANG='',i18nUsed=false;try{LANG=localStorage.getItem('pv_lang')||''}catch(e){}
 if(LANG!=='ar'&&!TX[LANG]){const nl=String((navigator.languages&&navigator.languages[0])||navigator.language||'ar').slice(0,2).toLowerCase();LANG=(nl==='en'||nl==='fr')?nl:'ar'}
 const SKIP='pre,textarea,script,style,iframe,#media,.src',SKIPA='pre,script,style,iframe,#media,.src,#code';
 const oT=new WeakMap(),cT=new WeakMap();
 const PHX={en:{'العرض':'Width','الارتفاع':'Height'},fr:{'العرض':'Largeur','الارتفاع':'Hauteur'}};
-function trs(v,ph){if(LANG==='ar')return null;const t=v.trim();if(!t)return null;if(ph&&PHX[LANG]&&PHX[LANG][t])return v.replace(t,PHX[LANG][t]);const d=TX[LANG][t];if(d!=null)return v.replace(t,d);
- for(const k in PX[LANG])if(t===k||t.startsWith(k+' '))return v.replace(k,PX[LANG][k]);return null}
+const TRC={};function trs(v,ph,np){if(LANG==='ar')return null;const ck=LANG+(ph?'p':'')+(np?'n':'')+v,hit=TRC[ck];if(hit!==undefined)return hit;const r=trs0(v,ph,np);if(v.length<400){TRC[ck]=r;if(++TRCn>4000){for(const k in TRC)delete TRC[k];TRCn=0}}return r}
+let TRCn=0;
+function trs0(v,ph,np){const t=v.trim();if(!t)return null;if(ph&&PHX[LANG]&&PHX[LANG][t])return v.replace(t,PHX[LANG][t]);const d=TX[LANG][t];if(d!=null)return v.replace(t,d);
+ for(const k in PX[LANG])if(t===k||t.startsWith(k+' '))return v.replace(k,PX[LANG][k]);
+ if(!np&&/[\u0600-\u06FF]/.test(v)){const r=phr(v,LANG);if(r!==v)return r}return null}
+const NOPH='.rn>b,.tile small,.fh span,.at>b,b.ltr,.row2 b';
 function doText(n){const p=n.parentElement;if(!p||p.closest(SKIP))return;let o=oT.get(n);if(o!==undefined&&n.nodeValue!==cT.get(n))o=undefined;if(o===undefined)o=n.nodeValue;
- const t=trs(o),nv=t==null?o:t;if(t!=null||oT.has(n)){oT.set(n,o);cT.set(n,nv);if(n.nodeValue!==nv)n.nodeValue=nv;if(t!=null)i18nUsed=true}}
+ const t=trs(o,false,!!(p.matches&&p.matches(NOPH))),nv=t==null?o:t;if(t!=null||oT.has(n)){oT.set(n,o);cT.set(n,nv);if(n.nodeValue!==nv)n.nodeValue=nv;if(t!=null)i18nUsed=true}}
 const I18A=['title','aria-label','placeholder'];
 function doAttr(e){if(e.closest(SKIPA))return;I18A.forEach(a=>{if(!e.hasAttribute(a))return;const k='o_'+a,c='c_'+a;let o=e[k];if(o!==undefined&&e.getAttribute(a)!==e[c])o=undefined;if(o===undefined)o=e.getAttribute(a);
  const t=trs(o,a==='placeholder'),nv=t==null?o:t;if(t!=null||e[k]!==undefined){e[k]=o;e[c]=nv;if(e.getAttribute(a)!==nv)e.setAttribute(a,nv);if(t!=null)i18nUsed=true}})}
@@ -1092,19 +1425,22 @@ function walk(root){if(root.nodeType===3){doText(root);return}if(root.nodeType!=
 const I18O={childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['title','aria-label','placeholder','dir']};
 let i18q=new Set(),i18r=0;
 const i18mo=new MutationObserver(ms=>{if(LANG==='ar'&&!i18nUsed)return;
- ms.forEach(m=>{if(m.type==='childList')m.addedNodes.forEach(n=>i18q.add(n));else if(m.type==='characterData')i18q.add(m.target);else if(m.target.nodeType===1){const e=m.target;i18q.add({a:e})}});
+ ms.forEach(m=>{const tg=m.target,te=tg.nodeType===1?tg:tg.parentElement;if(te&&te.closest(SKIPA))return;if(m.type==='childList')m.addedNodes.forEach(n=>i18q.add(n));else if(m.type==='characterData')i18q.add(m.target);else if(m.target.nodeType===1){const e=m.target;i18q.add({a:e})}});
  if(!i18r)i18r=requestAnimationFrame(()=>{i18r=0;const l=[...i18q];i18q.clear();i18mo.disconnect();
   l.forEach(n=>{if(n.a){if(n.a.isConnected){doAttr(n.a);doDir1(n.a)}}else if(n.isConnected)walk(n)});i18mo.observe(document.body,I18O)})});
 const lmenu=document.createElement('div');lmenu.className='dmenu lmenu';lmenu.hidden=true;document.body.append(lmenu);
 function buildLangMenu(){lmenu.replaceChildren();LANGS.forEach(([c,nm])=>{const b=document.createElement('button');b.className='di';b.type='button';const s=document.createElement('span');s.className='dn';s.textContent=nm;s.dir='auto';b.append(s);
  if(c===LANG){const k=document.createElement('span');k.textContent='✓';k.style.color='#1a73e8';b.append(k)}b.onclick=()=>{lmenu.hidden=true;setLang(c)};lmenu.append(b)})}
 function setLang(c,sv=true){LANG=c;if(sv)try{localStorage.setItem('pv_lang',c)}catch(e){}
- const h=document.documentElement;h.lang=c;h.dataset.ldir=c==='ar'?'rtl':'ltr';i18mo.disconnect();walk(document.body);i18mo.observe(document.body,I18O)}
+ const h=document.documentElement;h.lang=c;h.dataset.ldir=c==='ar'?'rtl':'ltr';{const fr=document.getElementById('frame');if(fr)fr.title=(TX[c]&&TX[c]['المعاينة'])||'المعاينة'}i18mo.disconnect();walk(document.body);i18mo.observe(document.body,I18O)}
 $('langb').onclick=e=>{e.stopPropagation();if(!lmenu.hidden){lmenu.hidden=true;return}$('fb').hidden=true;buildLangMenu();lmenu.hidden=false;
  const r=$('langb').getBoundingClientRect(),w=lmenu.offsetWidth,hh=lmenu.offsetHeight;let x=Math.max(8,Math.min(r.left+r.width/2-w/2,innerWidth-w-8)),y=r.bottom+8;if(y+hh>innerHeight-8)y=Math.max(8,r.top-hh-8);lmenu.style.left=x+'px';lmenu.style.top=y+'px'};
 document.addEventListener('click',e=>{if(!lmenu.hidden&&!lmenu.contains(e.target))lmenu.hidden=true});
 addEventListener('keydown',e=>{if(e.key==='Escape')lmenu.hidden=true});
 setLang(LANG,false);
+document.addEventListener('contextmenu',e=>{const t=e.target;if(!t||!t.closest)return;const em=document.getElementById('empty');
+ if(t.closest('.scene,.tw,.typeNow')||(t.id==='code'&&em&&em.offsetParent!==null&&!code.value))e.preventDefault()},true);
+document.addEventListener('selectstart',e=>{const t=e.target&&(e.target.nodeType===1?e.target:e.target.parentElement);if(t&&t.closest&&t.closest('.scene'))e.preventDefault()},true);
 
 /* تنزيل الملف */
 $('exp').onclick=()=>{const m=meta[idx],k=m.kind||'html';if(!m.kind&&!hist[idx].trim())return toast('لا يوجد ملف لتنزيله بعد');
@@ -1262,7 +1598,8 @@ const ringSets=[
  {scene:$('scene2'),ring:$('ring2'),on:()=>false}];
 ringSets.forEach(r=>{r.fcs=CARDS.map((o,i)=>{const d=document.createElement('div');d.className='fc';d.innerHTML=fileSvg(r.scene.id+i,o);r.ring.append(d);return d})});
 let ringRaf=0,ringT0=0,ringA=0,ringL=0;
-function ringFrame(t){let any=false;const dt=ringL?Math.min(t-ringL,40):16;ringL=t;ringA+=dt*0.00040;const a0=ringA;
+let ringS=0;
+function ringFrame(t){if(t-ringS<30){ringRaf=requestAnimationFrame(ringFrame);return}ringS=t;let any=false;const dt=ringL?Math.min(t-ringL,40):16;ringL=t;ringA+=dt*0.00040;const a0=ringA;
  ringSets.forEach(r=>{if(!r.on())return;any=true;const R=Math.min(165,r.scene.clientWidth*0.40||130),N=r.fcs.length;
   for(let i=0;i<N;i++){const th=a0+i*2*Math.PI/N,x=R*Math.sin(th),z=R*Math.cos(th),y=-z*0.36+Math.sin(t/900+i*1.3)*4,yaw=-Math.sin(th)*30,k=(z+R)/(2*R),c=r.fcs[i];
    c.style.transform='translate3d('+x.toFixed(1)+'px,'+y.toFixed(1)+'px,'+z.toFixed(1)+'px) rotateY('+yaw.toFixed(1)+'deg) rotateX(-6deg)';
@@ -1785,10 +2122,10 @@ const APK=(()=>{
   if(!R)return null;const x=e.ext;
   if(x==='xml'&&u8[0]===3&&u8[1]===0&&u8[2]===8&&u8[3]===0){const t=axml(u8);if(t&&t.root)return{note:'ملف XML ثنائي — تم فك ترميزه إلى نص',text:toXml(t,R.resolve)}}
   if(x==='arsc'&&R.T)return{note:'جدول الموارد الثنائي — تم فك ترميزه',text:arscText(R.T)};
-  if(x==='dex'){const t=dexText(u8,e.name);if(t)return{note:'ملف DEX — قائمة الفئات والدوال والحقول',text:t}}
+  if(x==='dex'){const t=dexText(u8,e.name);if(t)return{note:'ملف DEX — قائمة الفئات والدوال والحقول',text:t,gen:1}}
   if(/^(rsa|dsa|ec)$/.test(x)&&/^META-INF\//i.test(e.path)){const cs=p7certs(u8).map(cert).filter(Boolean);
-   if(cs.length)return{note:'شهادة التوقيع',text:cs.map((c,i)=>['شهادة '+(i+1),'المالك: '+c.subject,'الجهة المصدِرة: '+c.issuer,'الرقم التسلسلي: '+c.serial,'صالحة: '+c.from+' ← '+c.to,'الخوارزمية: '+c.sigAlg+' • المفتاح: '+c.keyAlg,'SHA-1: '+c.sha1,'SHA-256: '+c.sha256].join('\n')).join('\n\n')}}
-  if(x==='so'){const t=elfText(u8,e.path);if(t)return{note:'مكتبة أصلية (ELF)',text:t}}
+   if(cs.length)return{note:'شهادة التوقيع',text:cs.map((c,i)=>['شهادة '+(i+1),'المالك: '+c.subject,'الجهة المصدِرة: '+c.issuer,'الرقم التسلسلي: '+c.serial,'صالحة: '+c.from+' ← '+c.to,'الخوارزمية: '+c.sigAlg+' • المفتاح: '+c.keyAlg,'SHA-1: '+c.sha1,'SHA-256: '+c.sha256].join('\n')).join('\n\n'),gen:1}}
+  if(x==='so'){const t=elfText(u8,e.path);if(t)return{note:'مكتبة أصلية (ELF)',text:t,gen:1}}
   return null}
  return{analyze,special,axml,toXml,arsc,arscText,dexOpen,dexSummary,dexText,sha256,sha1,sdkName,permInfo,fsz,cert,p7certs,sigBlock,manifestInfo}
 })();
@@ -2125,7 +2462,7 @@ const ARC=(()=>{
   bd.append(mkEl('div','anote','جارٍ التحميل…'));
   try{const u8=await data(e);bd.replaceChildren();if(e.crcBad)bd.append(mkEl('div','anote','تنبيه: فشل فحص سلامة هذا الملف (CRC).'));
    const sp=A.apk?await APK.special(A.apk,e,u8):null;
-   if(sp){bd.append(mkEl('div','anote',sp.note));const p=mkEl('pre','src'),big=sp.text.length>400*1024;p.textContent=big?sp.text.slice(0,400*1024):sp.text;bd.append(p);if(big)bd.append(mkEl('div','anote','عُرض أول 400KB فقط، نزّل الملف المفكوك من فئة «تقارير التحليل» لقراءته كاملًا.'))}
+   if(sp){bd.append(mkEl('div','anote',sp.note));const p=mkEl('pre','src'),big=sp.text.length>400*1024;{const tx=big?sp.text.slice(0,400*1024):sp.text;p.textContent=sp.gen?GT(tx):tx}bd.append(p);if(big)bd.append(mkEl('div','anote','عُرض أول 400KB فقط، نزّل الملف المفكوك من فئة «تقارير التحليل» لقراءته كاملًا.'))}
    else if(e.bk==='image'){const i=new Image();i.className='big';i.alt='';if(!e.turl)e.turl=URL.createObjectURL(new Blob([u8],{type:mime(e.ext)}));i.src=e.turl;bd.append(i)}
    else if(e.bk==='media'){const isV=/^video/.test(mime(e.ext)),m=document.createElement(isV?'video':'audio');m.controls=true;m.src=URL.createObjectURL(new Blob([u8],{type:mime(e.ext)}));A.urls.push(m.src);bd.append(m)}
    else if(e.bk==='font'){const box=mkEl('div','fontbox');bd.append(box);const url=URL.createObjectURL(new Blob([u8],{type:mime(e.ext)}));A.urls.push(url);showFont({url,file:{size:u8.length}},box)}
@@ -2134,7 +2471,7 @@ const ARC=(()=>{
    else if(e.bk==='arc'){bd.append(btn('pri',IC.box,'فتح هذا الأرشيف',()=>open([new File([u8],e.name,{type:mime(e.ext)})])))}
    else if(TEXTEXT.has(e.ext)||!u8.subarray(0,4000).includes(0)){
     if(/^(html?|xhtml)$/.test(e.ext)){const row=mkEl('div','vact');row.append(btn('pri',IC.eye,'معاينة هذه الصفحة',()=>goto(A,e.path)));bd.append(row)}
-    const p=mkEl('pre','src'),t=TXT(u8.length>400*1024?u8.subarray(0,400*1024):u8);p.textContent=t;bd.append(p);
+    const p=mkEl('pre','src'),t=TXT(u8.length>400*1024?u8.subarray(0,400*1024):u8);p.textContent=e.path==='_decoded/APK-report.txt'?GT(t):t;bd.append(p);
     if(u8.length>400*1024)bd.append(mkEl('div','anote','عُرض أول 400KB فقط، نزّل الملف لقراءته كاملًا.'))}
    else bd.append(mkEl('div','anote','لا توجد معاينة لهذا النوع، يمكنك تنزيله.'))}
   catch(err){bd.replaceChildren(mkEl('div','anote',err.message==='enc'?'الملف مشفّر.':'تعذر استخراج هذا الملف (قد يكون تالفًا).'))}}
@@ -2197,9 +2534,11 @@ render();requestAnimationFrame(thumb);new ResizeObserver(thumb).observe($('bar')
 (function(){var K='pv-theme',h=document.documentElement,b=document.getElementById('themeb');if(!b)return;
 var mt=document.querySelector('meta[name=theme-color]');if(!mt){mt=document.createElement('meta');mt.name='theme-color';document.head.appendChild(mt)}
 function apply(d){if(d)h.setAttribute('data-theme','dark');else h.removeAttribute('data-theme');b.setAttribute('aria-pressed',d?'true':'false');b.classList.toggle('act',!!d);mt.content=d?'#050506':'#f8f9fa'}
-var d=false;try{d=localStorage.getItem(K)==='dark'}catch(e){}
+var d=false,st=null,mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');try{st=localStorage.getItem(K)}catch(e){}
+d=st?st==='dark':!!(mq&&mq.matches);
 apply(d);
-b.addEventListener('click',function(){d=!d;apply(d);try{localStorage.setItem(K,d?'dark':'light')}catch(e){}});
+b.addEventListener('click',function(){d=!d;st=d?'dark':'light';apply(d);try{localStorage.setItem(K,st)}catch(e){}});
+if(mq){var ch=function(e){if(!st){d=e.matches;apply(d)}};mq.addEventListener?mq.addEventListener('change',ch):mq.addListener&&mq.addListener(ch)}
 })();
 </script>
 </body>
