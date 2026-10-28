@@ -503,6 +503,9 @@ html[data-theme=dark] .ed .empty b{color:#f1f2f5}
 html[data-theme=dark] .ed .empty span:not(.lb span){color:#a3a9b3}
 html[data-theme=dark] .ed .code::placeholder{color:#8b93a0;-webkit-text-fill-color:#8b93a0}
 html[data-theme=dark] .pcard textarea{color:#e9ebef}
+/* إصلاح: في الوضع المظلم كانت قاعدة .code تجعل خلفية حقل الكتابة معتمة فتغطي النص الملوّن خلفه */
+html[data-theme=dark] .ed .code{background:transparent;color:transparent;-webkit-text-fill-color:transparent}
+html[data-theme=dark] .pcard .pw textarea{background:transparent;-webkit-text-fill-color:transparent}
 html[data-theme=dark] .pcard .ph span{color:#c6ccd6}
 html[data-theme=dark] .pcard .pin{background:linear-gradient(180deg,#1b1d22,#121316)}
 html[data-theme=dark] .pcard{filter:drop-shadow(0 10px 16px #0009) drop-shadow(0 2px 4px #0006)}
