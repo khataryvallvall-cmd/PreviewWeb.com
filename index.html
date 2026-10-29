@@ -657,7 +657,7 @@ const BIN={};
 'mp3 wav ogg oga m4a aac flac opus'.split(' ').forEach(e=>BIN[e]='audio');
 'woff woff2 ttf otf'.split(' ').forEach(e=>BIN[e]='font');BIN.pdf='pdf';
 const BCOL={image:'#1a73e8',video:'#8e24aa',audio:'#f57c00',pdf:'#d93025',font:'#37474f'};
-const isBin=k=>k==='image'||k==='video'||k==='audio'||k==='pdf'||k==='font';
+const isBin=k=>k==='image'||k==='video'||k==='audio'||k==='pdf'||k==='font'||k==='x';
 const fmtSize=n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
 const LG=[
  ['PHP','#777bb3','php',/^\s*<\?(php|=)/i,'html','PHP'],
@@ -870,8 +870,160 @@ addEventListener('scroll',closeDMenu,{passive:true});
 {let rz=0;addEventListener('resize',()=>{if(rz)return;rz=requestAnimationFrame(()=>{rz=0;fit()})},{passive:true})}
 document.addEventListener('fullscreenchange',applyDev);
 /* في وضع ملء الشاشة الحقيقي لا يُعرض إلا ما بداخل العنصر الممتد، فننقل القوائم والتنبيه إليه */
-function hostMenus(){const h=document.fullscreenElement||document.body;[dm,am,$('toast')].forEach(e=>{if(e&&e.parentNode!==h)h.append(e)})}
+function hostMenus(){const h=document.fullscreenElement||document.body;[dm,am,typeof lmenu!=='undefined'?lmenu:null,$('toast')].forEach(e=>{if(e&&e.parentNode!==h)h.append(e)})}
 document.addEventListener('fullscreenchange',hostMenus);
+
+/* ===== عارض الصيغ الاحترافية: CAD / ثلاثي الأبعاد / PSD / AI / INDD / RAW / AVI / قواعد البيانات ===== */
+const XT={dxf:['DXF','#e53935'],dwg:['DWG','#e53935'],obj:['OBJ','#00897b'],stl:['STL','#00897b'],fbx:['FBX','#00897b'],step:['STEP','#3949ab'],stp:['STEP','#3949ab'],iges:['IGES','#3949ab'],igs:['IGES','#3949ab'],psd:['PSD','#001e36'],psb:['PSB','#001e36'],ai:['AI','#ff7c00'],indd:['INDD','#d6336c'],avi:['AVI','#8e24aa'],db:['DB','#336791'],sqlite:['SQLite','#336791'],sqlite3:['SQLite','#336791'],mdb:['MDB','#a4373a'],accdb:['ACCDB','#a4373a']};
+'raw cr2 cr3 nef nrw arw srf sr2 dng orf rw2 raf pef srw 3fr erf kdc mrw x3f'.split(' ').forEach(e=>XT[e]=[e.toUpperCase(),'#546e7a']);
+{const s=document.createElement('style');s.textContent='.media.k-x{display:block!important;overflow:auto;padding:0}.xv canvas{touch-action:none}.xch{all:unset;cursor:pointer;padding:4px 10px;border-radius:999px;background:var(--pill);font-size:12px;margin:2px}.xch[aria-pressed=false]{opacity:.4}';document.head.append(s)}
+async function XV(f){const ext=(f.name.split('.').pop()||'').toLowerCase(),t=XT[ext];if(!t||!f.name.includes('.'))return 0;
+ commit('',{kind:'x',label:t[0],name:f.name,fname:f.name,file:f,url:URL.createObjectURL(f),logo:mk(t[0],t[1]),ext});render(true);view('prev');toast('تم رفع ملف '+t[0]);return 1}
+const xe=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.textContent=h;return e};
+function panel(el,R,note,img){const d=xe('div','xv');d.style.cssText='padding:18px;display:grid;gap:12px;direction:rtl;max-width:760px;margin:auto';
+ if(img){const i=new Image();i.src=img;i.style.cssText='max-width:100%;max-height:60vh;margin:auto;border-radius:12px;background:#fff;box-shadow:0 0 0 1px var(--line)';d.append(i)}
+ Object.entries(R).forEach(([k,v])=>{if(v===''||v==null)return;const r=xe('div');r.style.cssText='display:flex;gap:12px;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 2px;font-size:14px';const a=xe('span',0,k),b=xe('b',0,v);a.style.color='var(--mute)';b.style.cssText='font-weight:500;direction:ltr;unicode-bidi:plaintext;text-align:left;overflow-wrap:anywhere';r.append(a,b);d.append(r)});
+ if(note){const n=xe('div',0,note);n.style.cssText='background:var(--pill);border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.7;color:var(--mute)';d.append(n)}el.append(d);return d}
+async function xrun(m,el){const e=m.ext;try{const u=new Uint8Array(await m.file.arrayBuffer()),tx=()=>new TextDecoder().decode(u),S=fmtSize(u.length);
+ if(e==='dxf')dxfView(el,dxf(tx()));
+ else if(e==='obj')gl3(el,obj(tx()));
+ else if(e==='stl')gl3(el,stl(u));
+ else if(e==='fbx')gl3(el,await fbx(u));
+ else if(e==='step'||e==='stp')step(el,tx());
+ else if(e==='iges'||e==='igs'){const M=iges(tx());gl3(el,M,'خطوط مستقيمة فقط (الأقواس والأسطح المنحنية تحتاج برنامج CAD).')}
+ else if(e==='dwg')dwg(u,el);
+ else if(e==='psd'||e==='psb')await psd(u,el);
+ else if(e==='ai')ai(u,m,el);
+ else if(e==='indd'){const X=xmp(u),th=X.th;delete X.th;panel(el,{'النوع':'Adobe InDesign',...X,'الحجم':S},'ملف INDD مغلق الصيغة: تُعرض معاينته المضمّنة وبياناته. للعرض الكامل صدّره PDF من InDesign.',th)}
+ else if(e==='avi')avi(u,el);
+ else if(e==='db'||e==='sqlite'||e==='sqlite3'||e==='mdb'||e==='accdb')dbv(u,m,el);
+ else await raw(u,el)}catch(x){panel(el,{'الملف':m.name},'تعذر فتح هذا الملف داخل المتصفح، قد يكون تالفًا أو بصيغة فرعية غير مدعومة.')}}
+/* ---- XMP (PSD / AI / INDD) ---- */
+function xmp(u){const s=new TextDecoder('latin1').decode(u.subarray(0,3e7)),a=s.indexOf('<x:xmpmeta'),b=s.indexOf('</x:xmpmeta>');if(a<0||b<0)return{};const x=s.slice(a,b),g=n=>{const r=new RegExp('<'+n+'[^>]*>([\\s\\S]*?)</'+n+'>').exec(x),q=new RegExp(n+'="([^"]*)"').exec(x);return r?r[1].replace(/<[^>]+>/g,' ').trim():q?q[1]:''};
+ const th=/<xmpGImg:image>([^<]+)<\/xmpGImg:image>/.exec(x),F=[...new Set([...x.matchAll(/stFnt:fontName>([^<]+)</g)].map(v=>v[1]))];
+ return{'العنوان':g('dc:title'),'الأداة':g('xmp:CreatorTool'),'تاريخ الإنشاء':g('xmp:CreateDate'),'آخر تعديل':g('xmp:ModifyDate'),'عدد الصفحات':g('xmpTPg:NPages'),'الخطوط':F.slice(0,12).join('، '),th:th?'data:image/jpeg;base64,'+th[1].replace(/&#xA;|\s/g,''):''}}
+/* ---- AI ---- */
+function ai(u,m,el){const s=new TextDecoder('latin1').decode(u.subarray(0,1024)),i=s.indexOf('%PDF');if(i>=0){if(i)m.file=m.file.slice(i);return showPDF(m,el)}
+ const h=new TextDecoder('latin1').decode(u.subarray(0,20000)),g=n=>((new RegExp('%%'+n+':\\s*(.*)').exec(h)||[])[1]||'').trim(),X=xmp(u),th=X.th;delete X.th;
+ panel(el,{'النوع':'Adobe Illustrator (PostScript)','العنوان':g('Title'),'المنشئ':g('Creator'),'الأبعاد (BoundingBox)':g('BoundingBox'),'التاريخ':g('CreationDate'),...X},'هذا الملف قديم بلا طبقة PDF. احفظه من Illustrator مع خيار «Create PDF Compatible File» ليُعرض كاملًا.',th)}
+/* ---- DWG ---- */
+function dwg(u,el){const v=String.fromCharCode(...u.subarray(0,6)),V={AC1009:'R11/R12',AC1012:'R13',AC1014:'R14',AC1015:'2000',AC1018:'2004',AC1021:'2007',AC1024:'2010',AC1027:'2013',AC1032:'2018+'};let img='';
+ try{const dv=new DataView(u.buffer,u.byteOffset),p=dv.getUint32(13,true);if(p>0&&p<u.length){let o=p+20;const n=u[o++];for(let i=0;i<n;i++){const c=u[o],s=dv.getUint32(o+1,true),z=dv.getUint32(o+5,true);o+=9;
+  if(c===4)img=URL.createObjectURL(new Blob([u.subarray(s,s+z)],{type:'image/png'}));
+  else if(c===2&&!img){const d=u.subarray(s,s+z),dd=new DataView(d.buffer,d.byteOffset),bc=d[14],cu=dd.getUint32(32,true),h=new Uint8Array(14),hd=new DataView(h.buffer);h.set([66,77]);hd.setUint32(2,14+z,true);hd.setUint32(10,14+dd.getUint32(0,true)+(bc<=8?4*(cu||1<<bc):0),true);img=URL.createObjectURL(new Blob([h,d],{type:'image/bmp'}))}}}}catch(e){}
+ panel(el,{'النوع':'AutoCAD DWG','الإصدار':(V[v]||v)+' ('+v+')','الحجم':fmtSize(u.length)},img?'الصورة أعلاه هي المعاينة المضمّنة داخل الملف. الرسم الهندسي الكامل ببنية DWG المغلقة يحتاج AutoCAD؛ صدّره DXF لعرضه هنا بالتفصيل.':'لا توجد صورة معاينة داخل الملف. صدّره بصيغة DXF لعرض الرسم هنا بالتفصيل.',img)}
+/* ---- DXF ---- */
+const ACI=i=>{i=Math.abs(i);if(i===7||i<1)return'#222';if(i<7)return['','#f00','#e6b800','#0a0','#0bb','#00f','#f0f'][i];if(i===8)return'#808080';if(i===9)return'#c0c0c0';if(i>249)return'hsl(0 0% '+(15+(i-250)*14)+'%)';const k=(i-10)%10,h=Math.floor((i-10)/10)*15,v=[1,.65,.5,.3,.15][k>>1],s=k&1?.5:1,l=v*(1-s/2),sl=l&&l<1?(v-l)/Math.min(l,1-l):0;return`hsl(${h} ${sl*100}% ${l*100}%)`};
+function dxf(t){const L=t.split(/\r?\n/),ly={},S=[],sk={};let sec='',s0=0,c=null,pl=null;
+ const flush=()=>{if(!c)return;const e=c,F=e.f;c=null;const gv=n=>{const r=F.find(x=>x[0]===n);return r?+r[1]:0},gs=n=>{const r=F.find(x=>x[0]===n);return r?r[1]:''};
+  if(sec==='TABLES'&&e.t==='LAYER'){ly[gs(2)]=ACI(gv(62)||7);return}if(sec!=='ENTITIES')return;
+  const col=()=>{const k=gv(62);return k>0&&k<256?ACI(k):ly[gs(8)]||'#222'},add=(p,cl)=>{if(p.length>=4)S.push({l:gs(8)||'0',c:col(),p})},T=e.t;
+  if(T==='LINE')add([gv(10),gv(20),gv(11),gv(21)]);
+  else if(T==='LWPOLYLINE'||T==='SPLINE'){const p=[];F.forEach(([k,v])=>{if(k===10)p.push(+v);else if(k===20)p.push(+v)});if(T==='LWPOLYLINE'&&gv(70)&1)p.push(p[0],p[1]);add(p)}
+  else if(T==='POLYLINE')pl={t:T,f:F,p:[]};else if(T==='VERTEX'&&pl)pl.p.push(gv(10),gv(20));
+  else if(T==='SEQEND'&&pl){const q=pl;pl=null;c=null;const cc=()=>{const k=+((q.f.find(x=>x[0]===62)||[0,0])[1]);return k>0&&k<256?ACI(k):ly[(q.f.find(x=>x[0]===8)||[0,'0'])[1]]||'#222'};if(q.p.length>=4)S.push({l:(q.f.find(x=>x[0]===8)||[0,'0'])[1],c:cc(),p:q.p})}
+  else if(T==='CIRCLE'||T==='ARC'){const x=gv(10),y=gv(20),r=gv(40);let a=T==='ARC'?gv(50):0,b=T==='ARC'?gv(51):360;if(b<=a)b+=360;const n=Math.max(8,Math.ceil((b-a)/5)),p=[];for(let i=0;i<=n;i++){const q=(a+(b-a)*i/n)*Math.PI/180;p.push(x+r*Math.cos(q),y+r*Math.sin(q))}add(p)}
+  else sk[T]=(sk[T]||0)+1};
+ for(let i=0;i+1<L.length;i+=2){const k=+L[i].trim(),v=L[i+1].trim();if(k===0){flush();if(v==='SECTION')s0=1;if(v==='ENDSEC')sec='';c=(v==='SECTION'||v==='ENDSEC'||v==='EOF')?null:{t:v,f:[]}}else if(k===2&&s0){sec=v;s0=0}else if(c)c.f.push([k,v])}
+ flush();return{S,sk,ly}}
+function dxfView(el,D){const S=D.S;if(!S.length)return panel(el,{'الكيانات':'0'},'لم أجد كيانات قابلة للرسم (ملف DXF ثنائي أو يحتوي كتلًا فقط).');
+ let x0=1e30,y0=1e30,x1=-1e30,y1=-1e30;S.forEach(s=>{for(let i=0;i<s.p.length;i+=2){const x=s.p[i],y=s.p[i+1];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}});
+ const box=xe('div','xv'),c=xe('canvas'),off=new Set(),d=xe('div');c.style.cssText='width:100%;height:68vh;display:block;background:#fff;border-radius:14px;box-shadow:0 0 0 1px var(--line)';d.style.cssText='padding:8px 4px;direction:ltr';box.append(c,d);el.append(box);
+ const lays=[...new Set(S.map(s=>s.l))];let sc=1,ox=0,oy=0,fit=1;
+ const draw=()=>{const r=devicePixelRatio||1,w=c.clientWidth*r,h=c.clientHeight*r;c.width=w;c.height=h;const g=c.getContext('2d');g.lineWidth=r;g.lineJoin='round';const F=Math.min(w/((x1-x0)||1),h/((y1-y0)||1))*.92;if(fit){sc=F;ox=(w-(x1-x0)*F)/2-x0*F;oy=h-((h-(y1-y0)*F)/2)+y0*F;fit=0}
+  S.forEach(s=>{if(off.has(s.l))return;g.strokeStyle=s.c;g.beginPath();for(let i=0;i<s.p.length;i+=2){const X=s.p[i]*sc+ox,Y=-s.p[i+1]*sc+oy;i?g.lineTo(X,Y):g.moveTo(X,Y)}g.stroke()})};
+ lays.slice(0,60).forEach(n=>{const b=xe('button','xch',n);b.setAttribute('aria-pressed','true');b.onclick=()=>{off.has(n)?off.delete(n):off.add(n);b.setAttribute('aria-pressed',!off.has(n));draw()};d.append(b)});
+ const sk=Object.entries(D.sk).map(([k,v])=>k+'×'+v).join(' • ');d.append(xe('div','minfo',S.length+' كيان • '+lays.length+' طبقة'+(sk?' • لم تُرسم: '+sk:'')));
+ const P=new Map();let pd=0;c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY])};c.onpointerup=c.onpointercancel=e=>{P.delete(e.pointerId);pd=0};
+ const zoom=(f,cx,cy)=>{const r=devicePixelRatio||1,px=cx*r,py=cy*r;ox=px-(px-ox)*f;oy=py-(py-oy)*f;sc*=f;draw()};
+ c.onpointermove=e=>{const p=P.get(e.pointerId);if(!p)return;const r=devicePixelRatio||1;if(P.size===1){ox+=(e.clientX-p[0])*r;oy+=(e.clientY-p[1])*r;P.set(e.pointerId,[e.clientX,e.clientY]);draw()}else{P.set(e.pointerId,[e.clientX,e.clientY]);const q=[...P.values()],n=Math.hypot(q[0][0]-q[1][0],q[0][1]-q[1][1]),b=c.getBoundingClientRect();if(pd)zoom(n/pd,(q[0][0]+q[1][0])/2-b.left,(q[0][1]+q[1][1])/2-b.top);pd=n}};
+ c.onwheel=e=>{e.preventDefault();const b=c.getBoundingClientRect();zoom(e.deltaY<0?1.15:1/1.15,e.clientX-b.left,e.clientY-b.top)};
+ c.ondblclick=()=>{fit=1;draw()};requestAnimationFrame(draw)}
+/* ---- ثلاثي الأبعاد ---- */
+function obj(t){const V=[],T=[];for(const ln of t.split('\n')){const a=ln.trim().split(/\s+/);if(a[0]==='v')V.push(+a[1],+a[2],+a[3]);else if(a[0]==='f'){const ix=a.slice(1).map(s=>{const k=parseInt(s);return k<0?V.length/3+k:k-1});for(let i=1;i<ix.length-1;i++)for(const j of[ix[0],ix[i],ix[i+1]])T.push(V[j*3],V[j*3+1],V[j*3+2])}}return{t:new Float32Array(T)}}
+function stl(u){const dv=new DataView(u.buffer,u.byteOffset),n=u.length>84?dv.getUint32(80,true):0;
+ if(84+50*n===u.length){const T=new Float32Array(n*9);for(let i=0;i<n;i++)for(let k=0;k<9;k++)T[i*9+k]=dv.getFloat32(96+i*50+k*4,true);return{t:T}}
+ const T=[];for(const m of new TextDecoder().decode(u).matchAll(/vertex\s+(\S+)\s+(\S+)\s+(\S+)/g))T.push(+m[1],+m[2],+m[3]);return{t:new Float32Array(T)}}
+async function fbx(u){if(String.fromCharCode(...u.subarray(0,18))!=='Kaydara FBX Binary')throw 0;const dv=new DataView(u.buffer,u.byteOffset),w=dv.getUint32(23,true)>=7500?8:4,rd=o=>w===8?Number(dv.getBigUint64(o,true)):dv.getUint32(o,true),T=[],td=new TextDecoder();
+ const inf=async d=>new Uint8Array(await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
+ async function node(o){const end=rd(o),np=rd(o+w),pl=rd(o+2*w),nl=u[o+3*w];if(!end)return null;const name=td.decode(u.subarray(o+3*w+1,o+3*w+1+nl));let p=o+3*w+1+nl;const pr=[];
+  for(let i=0;i<np;i++){const c=String.fromCharCode(u[p++]);if('YCIFDL'.includes(c)){p+={Y:2,C:1,I:4,F:4,D:8,L:8}[c];pr.push(null)}else if(c==='S'||c==='R'){p+=4+dv.getUint32(p,true);pr.push(null)}
+   else{const n=dv.getUint32(p,true),en=dv.getUint32(p+4,true),cl=dv.getUint32(p+8,true);p+=12;let d=u.subarray(p,p+cl);p+=cl;if(en)d=await inf(d);const b=d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength);pr.push(c==='d'?new Float64Array(b):c==='f'?new Float32Array(b):c==='i'?new Int32Array(b):null)}}
+  const k=[];let q=o+3*w+1+nl+pl;while(q<end){const n=await node(q);if(!n)break;k.push(n);q=n.end}return{name,pr,k,end}}
+ const walk=n=>{if(n.name==='Geometry'){const V=(n.k.find(x=>x.name==='Vertices')||{pr:[]}).pr[0],I=(n.k.find(x=>x.name==='PolygonVertexIndex')||{pr:[]}).pr[0];if(V&&I){let P=[];for(const x of I){if(x<0){P.push(~x);for(let i=1;i<P.length-1;i++)for(const j of[P[0],P[i],P[i+1]])T.push(V[j*3],V[j*3+1],V[j*3+2]);P=[]}else P.push(x)}}}else n.k.forEach(walk)};
+ let o=27;while(o<u.length-w*3){const n=await node(o);if(!n)break;walk(n);o=n.end}return{t:new Float32Array(T)}}
+function step(el,t){const g=n=>(new RegExp(n+"\\s*\\(\\s*'([^']*)'","i").exec(t)||[])[1]||'',cnt={};for(const m of t.matchAll(/=\s*([A-Z_0-9]+)\s*\(/g))cnt[m[1]]=(cnt[m[1]]||0)+1;
+ const P=[];for(const m of t.matchAll(/CARTESIAN_POINT\s*\(\s*'[^']*'\s*,\s*\(([^)]*)\)/g)){const a=m[1].split(',').map(Number);if(a.length>=3&&P.length<9e5)P.push(a[0],a[1],a[2])}
+ const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]+'×'+x[1]).join(' • ');
+ gl3(el,{p:new Float32Array(P)},'المعاينة نقاط الهندسة فقط (STEP يحتوي أسطحًا رياضية تحتاج نواة CAD).',{'الاسم':g('FILE_NAME'),'المخطط':(/FILE_SCHEMA\s*\(\s*\(\s*'([^']*)'/i.exec(t)||[])[1]||'','أكثر الكيانات':top})}
+function iges(t){const l=[];for(const r of t.split(/\r?\n/).filter(x=>x[72]==='P').map(x=>x.slice(0,64)).join('').split(';')){const a=r.split(',');if(+a[0]===110&&a.length>=7)for(let i=1;i<7;i++)l.push(+a[i])}return{l:new Float32Array(l)}}
+function gl3(el,M,note,R){const box=xe('div','xv'),c=xe('canvas');c.style.cssText='width:100%;height:68vh;display:block;background:linear-gradient(#f3f6fa,#cfd8e3);border-radius:14px';box.append(c);el.append(box);
+ const n=(M.t?M.t.length/9:0),info={...(R||{}),'المثلثات':M.t?n.toLocaleString():'','النقاط':M.p?(M.p.length/3).toLocaleString():'','الخطوط':M.l?(M.l.length/6).toLocaleString():''};
+ if(!n&&!(M.p&&M.p.length)&&!(M.l&&M.l.length))return panel(box,{'الملف':'لا توجد هندسة قابلة للعرض'},'لم أعثر على مجسّم داخل الملف.');
+ const gl=c.getContext('webgl',{antialias:true});if(!gl)return panel(box,info,'المتصفح لا يدعم WebGL.');
+ let x0=1e30,y0=1e30,z0=1e30,x1=-1e30,y1=-1e30,z1=-1e30;[M.t,M.p,M.l].forEach(a=>{if(a)for(let i=0;i<a.length;i+=3){const x=a[i],y=a[i+1],z=a[i+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}});
+ const cx=(x0+x1)/2,cy=(y0+y1)/2,cz=(z0+z1)/2,rr=Math.max(x1-x0,y1-y0,z1-z0)/2||1;
+ const N=a=>{if(!a)return null;const b=new Float32Array(a.length);for(let i=0;i<a.length;i+=3){b[i]=(a[i]-cx)/rr;b[i+1]=(a[i+1]-cy)/rr;b[i+2]=(a[i+2]-cz)/rr}return b},t=N(M.t),p=N(M.p),l=N(M.l);
+ let nm=null;if(t){nm=new Float32Array(t.length);for(let i=0;i<t.length;i+=9){const ux=t[i+3]-t[i],uy=t[i+4]-t[i+1],uz=t[i+5]-t[i+2],vx=t[i+6]-t[i],vy=t[i+7]-t[i+1],vz=t[i+8]-t[i+2];let a=uy*vz-uz*vy,b=uz*vx-ux*vz,d=ux*vy-uy*vx;const q=Math.hypot(a,b,d)||1;a/=q;b/=q;d/=q;for(let k=0;k<3;k++){nm[i+k*3]=a;nm[i+k*3+1]=b;nm[i+k*3+2]=d}}}
+ const sh=(ty,s)=>{const h=gl.createShader(ty);gl.shaderSource(h,s);gl.compileShader(h);return h},pg=gl.createProgram();
+ gl.attachShader(pg,sh(gl.VERTEX_SHADER,'attribute vec3 a,n;uniform mat4 M;uniform mat3 R;varying vec3 v;void main(){gl_Position=M*vec4(a,1.);gl_PointSize=2.5;v=R*n;}'));
+ gl.attachShader(pg,sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 v;uniform vec3 C;void main(){float s=length(v)>.01?.3+.7*abs(normalize(v).z):1.;gl_FragColor=vec4(C*s,1.);}'));
+ gl.linkProgram(pg);gl.useProgram(pg);const bf=a=>{if(!a)return null;const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,a,gl.STATIC_DRAW);return b},B={t:bf(t),n:bf(nm),p:bf(p),l:bf(l)},z=new Float32Array(Math.max(p?p.length:0,l?l.length:0,3));B.z=bf(z);
+ const A=gl.getAttribLocation(pg,'a'),An=gl.getAttribLocation(pg,'n');gl.enableVertexAttribArray(A);gl.enableVertexAttribArray(An);gl.enable(gl.DEPTH_TEST);
+ let yaw=.6,pit=.4,dist=4.4,q=0;
+ const mul=(a,b)=>{const o=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+j]*b[i*4+k];o[i*4+j]=s}return o};
+ const draw=()=>{q=0;const r=devicePixelRatio||1,w=c.clientWidth*r,h=c.clientHeight*r;if(c.width!==w||c.height!==h){c.width=w;c.height=h}gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  const cy_=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pit),sp=Math.sin(pit),R=[cy_,0,sy,sp*sy,cp,-sp*cy_,-cp*sy,sp,cp*cy_],f=1/Math.tan(.4),a=w/h,Fa=100,Na=.05;
+  const Pm=new Float32Array([f/a,0,0,0,0,f,0,0,0,0,(Fa+Na)/(Na-Fa),-1,0,0,2*Fa*Na/(Na-Fa),0]),V=new Float32Array([R[0],R[3],R[6],0,R[1],R[4],R[7],0,R[2],R[5],R[8],0,0,0,-dist*Math.max(1,1/a),1]);
+  gl.uniformMatrix4fv(gl.getUniformLocation(pg,'M'),false,mul(Pm,V));gl.uniformMatrix3fv(gl.getUniformLocation(pg,'R'),false,new Float32Array([R[0],R[3],R[6],R[1],R[4],R[7],R[2],R[5],R[8]]));
+  const use=(b,nb,col,mode,cnt)=>{gl.uniform3fv(gl.getUniformLocation(pg,'C'),col);gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.vertexAttribPointer(A,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,nb);gl.vertexAttribPointer(An,3,gl.FLOAT,false,0,0);gl.drawArrays(mode,0,cnt)};
+  if(t)use(B.t,B.n,[.36,.55,.85],gl.TRIANGLES,t.length/3);if(l)use(B.l,B.z,[.1,.3,.6],gl.LINES,l.length/3);if(p)use(B.p,B.z,[.1,.3,.6],gl.POINTS,p.length/3)};
+ const rq=()=>{if(!q)q=requestAnimationFrame(draw)},P=new Map();let pd=0;
+ c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY])};c.onpointerup=c.onpointercancel=e=>{P.delete(e.pointerId);pd=0};
+ c.onpointermove=e=>{const o=P.get(e.pointerId);if(!o)return;if(P.size===1){yaw+=(e.clientX-o[0])*.01;pit=Math.max(-1.5,Math.min(1.5,pit+(e.clientY-o[1])*.01))}P.set(e.pointerId,[e.clientX,e.clientY]);if(P.size===2){const v=[...P.values()],n=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);if(pd)dist=Math.max(1.2,Math.min(12,dist*pd/n));pd=n}rq()};
+ c.onwheel=e=>{e.preventDefault();dist=Math.max(1.2,Math.min(12,dist*(e.deltaY<0?.9:1.1)));rq()};
+ panel(box,info,(note?note+' ':'')+'اسحب للتدوير • اقرص أو استخدم العجلة للتقريب.');rq()}
+/* ---- PSD ---- */
+async function psd(u,el){const dv=new DataView(u.buffer,u.byteOffset,u.byteLength);if(String.fromCharCode(...u.subarray(0,4))!=='8BPS')throw 0;
+ const big=dv.getUint16(4)===2,ch=dv.getUint16(12),H=dv.getUint32(14),W=dv.getUint32(18),dp=dv.getUint16(22),cm=dv.getUint16(24),L=()=>0;let o=26;const cl=dv.getUint32(o),pal=u.subarray(o+4,o+4+cl);o+=4+cl;o+=4+dv.getUint32(o);
+ const q8=p=>big?Number(dv.getBigUint64(p)):dv.getUint32(p),w8=big?8:4,ls=[];const li=q8(o);
+ try{if(li){let q=o+w8;const n=Math.abs(dv.getInt16(q+w8));q+=w8+2;for(let i=0;i<n&&i<3000;i++){const tp=dv.getInt32(q),lf=dv.getInt32(q+4),bt=dv.getInt32(q+8),rt=dv.getInt32(q+12),nc=dv.getUint16(q+16);q+=18+nc*(big?10:6);const op=u[q+9],fl=u[q+11],ex=dv.getUint32(q+16);q+=20;const e0=q;let k=e0;k+=4+dv.getUint32(k);k+=4+dv.getUint32(k);const nl=u[k];let nm=new TextDecoder('latin1').decode(u.subarray(k+1,k+1+nl));k+=(1+nl+3)&~3;
+  while(k+12<=e0+ex){const key=String.fromCharCode(...u.subarray(k+4,k+8)),len=dv.getUint32(k+8);if(key==='luni'){const c=dv.getUint32(k+12);let s='';for(let j=0;j<c&&j<200;j++)s+=String.fromCharCode(dv.getUint16(k+16+j*2));if(s)nm=s}k+=12+len}
+  q=e0+ex;ls.push({nm,w:rt-lf,h:bt-tp,op:Math.round(op/2.55),vis:!(fl&2)})}}}catch(e){}
+ o+=w8+li;const cp=dv.getUint16(o);o+=2;if(dp!==8&&dp!==16||cp>2)throw 0;const bpc=dp>>3,nch=Math.min(ch,cm===4?5:cm===1||cm===2?2:4),s=Math.max(1,Math.ceil(Math.max(W,H)/4096)),w=Math.ceil(W/s),h=Math.ceil(H/s);let base=u,bo=o;
+ if(cp===2){const d=await new Response(new Blob([u.subarray(o)]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer();base=new Uint8Array(d);bo=0}
+ const rows=[];if(cp===1){let p=o+nch*H*(big?4:2),c=o;for(let k=0;k<nch*H;k++){rows.push(p);p+=big?dv.getUint32(c):dv.getUint16(c);c+=big?4:2}}
+ const row=(c,y)=>{if(cp!==1){const st=bo+(c*H+y)*W*bpc;return base.subarray(st,st+W*bpc)}let p=rows[c*H+y];const r=new Uint8Array(W*bpc);let j=0;while(j<r.length){const n=u[p++]<<24>>24;if(n>=0){for(let k=0;k<=n&&j<r.length;k++)r[j++]=u[p++]}else if(n!==-128){const v=u[p++];for(let k=0;k<1-n&&j<r.length;k++)r[j++]=v}}return r};
+ const PL=[];for(let c=0;c<nch;c++){const a=new Uint8Array(w*h);for(let y=0;y<H;y+=s){const r=row(c,y),yy=(y/s)|0;for(let x=0;x<W;x+=s)a[yy*w+((x/s)|0)]=r[x*bpc]}PL.push(a)}
+ const cv=xe('canvas');cv.width=w;cv.height=h;cv.style.cssText='max-width:100%;height:auto;display:block;margin:auto;background:repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/16px 16px;border-radius:12px';const g=cv.getContext('2d'),im=g.createImageData(w,h),D=im.data,cl8=v=>v<0?0:v>255?255:v,ga=v=>255*(v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055);
+ for(let i=0;i<w*h;i++){let r,gg,b,a=255;if(cm===3){r=PL[0][i];gg=PL[1][i];b=PL[2][i];if(nch>3)a=PL[3][i]}else if(cm===1){r=gg=b=PL[0][i];if(nch>1)a=PL[1][i]}else if(cm===2){const k=PL[0][i];r=pal[k];gg=pal[256+k];b=pal[512+k]}
+  else if(cm===4){const k=PL[3][i];r=PL[0][i]*k/255;gg=PL[1][i]*k/255;b=PL[2][i]*k/255}
+  else{const Lv=PL[0][i]*100/255,A_=PL[1][i]-128,B_=PL[2][i]-128,fy=(Lv+16)/116,fx=fy+A_/500,fz=fy-B_/200,f=t=>t*t*t>.008856?t*t*t:(t-16/116)/7.787,X=.9642*f(fx),Y=f(fy),Z=.8249*f(fz);r=ga(3.1339*X-1.6169*Y-.4906*Z);gg=ga(-.9785*X+1.916*Y+.0334*Z);b=ga(.072*X-.229*Y+1.4057*Z)}
+  D[i*4]=cl8(r);D[i*4+1]=cl8(gg);D[i*4+2]=cl8(b);D[i*4+3]=a}
+ g.putImageData(im,0,0);const X=xmp(u);delete X.th,X['الأداة'];const box=xe('div','xv');box.style.cssText='padding:12px;display:grid;gap:12px';box.append(cv);el.append(box);
+ const d=panel(box,{'النوع':'Adobe Photoshop','الأبعاد':W+'×'+H+' px'+(s>1?' (المعاينة مصغّرة)':''),'نمط الألوان':{0:'Bitmap',1:'Grayscale',2:'Indexed',3:'RGB',4:'CMYK',9:'Lab'}[cm],'العمق':dp+' bit','الطبقات':ls.length||'',...X},'تُعرض الصورة المدمجة المحفوظة داخل الملف. إن ظهرت بيضاء فقد حُفظ الملف دون خيار «Maximize Compatibility».');
+ if(ls.length){const t=xe('div');t.style.cssText='display:grid;gap:4px;font-size:13px';ls.slice().reverse().slice(0,80).forEach(l=>{const r=xe('div',0,(l.vis?'● ':'○ ')+l.nm+'  —  '+l.w+'×'+l.h+' • '+l.op+'%');r.style.cssText='direction:ltr;unicode-bidi:plaintext;text-align:left;padding:5px 10px;background:var(--pill);border-radius:10px;opacity:'+(l.vis?1:.5);t.append(r)});d.append(t)}}
+/* ---- RAW ---- */
+function jend(u,i){let p=i+2;while(p<u.length-1){if(u[p]!==255){p++;continue}const k=u[p+1];if(k===255){p++;continue}if(k===217)return p+2;if(k===0||k===1||(k>=208&&k<=215)){p+=2;continue}p+=2+((u[p+2]<<8)|u[p+3]);if(k===218)while(p<u.length-1&&!(u[p]===255&&u[p+1]!==0&&!(u[p+1]>=208&&u[p+1]<=215)))p++}return u.length}
+function tiff(u,b){const R={};try{const dv=new DataView(u.buffer,u.byteOffset+b),le=u[b]===73;let o=dv.getUint32(4,le);const n=dv.getUint16(o,le);for(let i=0;i<n;i++){const e=o+2+i*12,t=dv.getUint16(e,le),ty=dv.getUint16(e+2,le),c=dv.getUint32(e+4,le);if(t===274)R.o=dv.getUint16(e+8,le);if((t===271||t===272)&&ty===2){const a=c>4?dv.getUint32(e+8,le):e+8;R[t]=new TextDecoder().decode(u.subarray(b+a,b+a+c-1)).trim()}}}catch(e){}return R}
+async function raw(u,el){const C=[];for(let i=0;i<u.length-3;i++)if(u[i]===255&&u[i+1]===216&&u[i+2]===255){const e=jend(u,i);if(e-i>3000)C.push([i,e]);i=e-1}C.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]));
+ const T=((u[0]===73&&u[1]===73)||(u[0]===77&&u[1]===77))?tiff(u,0):{},M={'النوع':'RAW (صورة خام)','الكاميرا':[T[271],T[272]].filter(Boolean).join(' '),'الحجم':fmtSize(u.length)};
+ for(const [a,b] of C.slice(0,6)){const url=URL.createObjectURL(new Blob([u.subarray(a,b)],{type:'image/jpeg'})),im=new Image();im.src=url;const ok=await new Promise(r=>{im.onload=()=>r(1);im.onerror=()=>r(0)});if(!ok)continue;
+  const o=T.o||1,sw=o>4,w=im.naturalWidth,h=im.naturalHeight,cv=xe('canvas');cv.width=sw?h:w;cv.height=sw?w:h;const g=cv.getContext('2d');if(o===3)g.transform(-1,0,0,-1,w,h);else if(o===6)g.transform(0,1,-1,0,h,0);else if(o===8)g.transform(0,-1,1,0,0,w);g.drawImage(im,0,0);cv.style.cssText='max-width:100%;height:auto;display:block;margin:auto;border-radius:12px';
+  const box=xe('div','xv');box.style.cssText='padding:12px;display:grid;gap:12px';box.append(cv);el.append(box);M['أبعاد المعاينة']=w+'×'+h;panel(box,M,'تُعرض المعاينة JPEG المدمجة داخل ملف RAW (ليست بيانات المستشعر الخام ولا تعديلها).');return}
+ panel(el,M,'لم أجد معاينة JPEG قابلة للعرض داخل هذا الملف. حوّله إلى DNG أو JPEG.')}
+/* ---- AVI / وسائط لا يفكها المتصفح / قواعد البيانات ---- */
+function avi(u,el){const dv=new DataView(u.buffer,u.byteOffset),s=new TextDecoder('latin1').decode(u.subarray(0,Math.min(u.length,2e5))),a=s.indexOf('avih'),R={'الحاوية':'AVI','الحجم':fmtSize(u.length)};
+ if(a>0){R['الأبعاد']=dv.getUint32(a+40,true)+'×'+dv.getUint32(a+44,true);const mp=dv.getUint32(a+8,true);if(mp){R['معدل الإطارات']=(1e6/mp).toFixed(2)+' fps';R['المدة']=Math.round(dv.getUint32(a+24,true)*mp/1e6)+' ث'}}
+ const v=s.indexOf('vids');if(v>0)R['ترميز الفيديو']=s.substr(v+4,4);R['الصوت']=s.includes('auds')?'موجود':'لا يوجد';panel(el,R,'المتصفحات لا تشغّل حاوية AVI. حوّل الملف إلى MP4 (H.264) لمعاينته هنا.')}
+async function mediaErr(m,el){el.replaceChildren();const u=new Uint8Array(await m.file.slice(0,4e6).arrayBuffer()),s=new TextDecoder('latin1').decode(u);
+ panel(el,{'الصيغة':m.label,'الحجم':fmtSize(m.file.size),'الترميز':(s.match(/avc1|hvc1|hev1|apcn|apch|apcs|apco|ap4h|mp4v|jpeg|av01|vp09|fLaC|WAVE/)||['غير معروف'])[0]},'المتصفح لا يفك ترميز هذا الملف (مثل ProRes أو WAV/FLAC بخصائص خاصة). حوّله إلى MP4/MP3/WAV قياسي.')}
+function dbv(u,m,el){const ac=m.ext==='mdb'||m.ext==='accdb',s=new TextDecoder('latin1').decode(u.subarray(0,Math.min(u.length,3e7))),R={'النوع':ac?'Microsoft Access':'SQLite','الحجم':fmtSize(u.length)};
+ if(s.startsWith('SQLite format 3')){const dv=new DataView(u.buffer,u.byteOffset);R['حجم الصفحة']=dv.getUint16(16)||65536;R['عدد الصفحات']=dv.getUint32(28);R['الترميز']=['','UTF-8','UTF-16le','UTF-16be'][dv.getUint32(56)]||'';
+  const T=new Map();for(const x of s.matchAll(/CREATE TABLE\s+(?:IF NOT EXISTS\s+)?["`\[]?([\w$]+)["`\]]?\s*\(/g)){if(T.has(x[1])||T.size>=40)continue;let d=1,i=x.index+x[0].length,c='',cols=[],cur='';for(;i<s.length&&d>0&&i-x.index<2000;i++){const ch=s[i];if(ch==='(')d++;else if(ch===')'){d--;if(!d)break}if(d===1&&ch===','){cols.push(cur.trim().split(/\s+/)[0]);cur=''}else cur+=ch}cols.push(cur.trim().split(/\s+/)[0]);T.set(x[1],cols.filter(Boolean).map(z=>z.replace(/["`\[\]]/g,'')).slice(0,12).join(', '))}
+  R['عدد الجداول']=T.size;const d=panel(el,R,T.size?'':'لم أعثر على تعريفات جداول.');T.forEach((v,k)=>{const r=xe('div',0,k+'  ( '+v+' )');r.style.cssText='direction:ltr;text-align:left;font:13px ui-monospace,monospace;padding:8px 12px;background:var(--pill);border-radius:10px;overflow-wrap:anywhere';d.append(r)});return}
+ if(ac){R['المحرك']=s.startsWith('\x00\x01\x00\x00Standard ACE')?'ACE (Access 2007+)':'Jet';R['الإصدار']=['Jet 3 (Access 97)','Jet 4 (Access 2000-2003)','ACE 12 (2007)','ACE 14 (2010)','ACE 15+'][u[20]]||''}
+ panel(el,R,ac?'قاعدة Access مغلقة الصيغة: افتحها بـ Access أو صدّر جداولها إلى CSV/SQLite لمعاينتها.':'الملف ليس بصيغة SQLite 3 معروفة.')}
 
 /* ===== عارض الوسائط: صور وفيديو وصوت وPDF وخطوط ===== */
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
@@ -879,9 +1031,9 @@ const loadScript=u=>new Promise((ok,no)=>{const e=document.createElement('script
 function showMedia(m){const el=$('media');el.replaceChildren();el.className='media k-'+m.kind;
  const info=document.createElement('div');info.className='minfo';const sz=fmtSize(m.file.size);info.textContent=sz;
  if(m.kind==='image'){const im=new Image();im.alt='';im.onload=()=>{info.textContent=im.naturalWidth+'×'+im.naturalHeight+' • '+sz};im.src=m.url;el.append(im,info)}
- else if(m.kind==='video'){const v=document.createElement('video');v.controls=true;v.playsInline=true;v.src=m.url;v.onloadedmetadata=()=>{info.textContent=v.videoWidth+'×'+v.videoHeight+' • '+Math.round(v.duration)+' ث • '+sz};el.append(v,info)}
- else if(m.kind==='audio'){const g=new Image();g.src=m.logo;g.alt='';const a=document.createElement('audio');a.controls=true;a.src=m.url;a.onloadedmetadata=()=>{info.textContent=Math.round(a.duration)+' ث • '+sz};el.append(g,a,info)}
- else if(m.kind==='pdf')showPDF(m,el);else showFont(m,el)}
+ else if(m.kind==='video'){const v=document.createElement('video');v.controls=true;v.playsInline=true;v.src=m.url;v.onerror=()=>mediaErr(m,el);v.onloadedmetadata=()=>{info.textContent=v.videoWidth+'×'+v.videoHeight+' • '+Math.round(v.duration)+' ث • '+sz};el.append(v,info)}
+ else if(m.kind==='audio'){const g=new Image();g.src=m.logo;g.alt='';const a=document.createElement('audio');a.controls=true;a.src=m.url;a.onerror=()=>mediaErr(m,el);a.onloadedmetadata=()=>{info.textContent=Math.round(a.duration)+' ث • '+sz};el.append(g,a,info)}
+ else if(m.kind==='pdf')showPDF(m,el);else if(m.kind==='x')xrun(m,el);else showFont(m,el)}
 /* pdf.js مضمَّن ومضغوط داخل الملف: لا يحتاج إنترنت، ويُفكّ ضغطه عند فتح أول PDF فقط */
 async function gunzip(b64){const bin=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
  return new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
@@ -1456,7 +1608,7 @@ $('full').onclick=async()=>{const c=$('card');if(c.classList.contains('pfs'))ret
  try{if(!c.requestFullscreen)throw 0;await c.requestFullscreen()}catch(e){c.classList.add('pfs');applyDev()}};
 addEventListener('keydown',e=>{if(e.key==='Escape'&&$('card').classList.contains('pfs'))exitPfs()});
 $('upload').onclick=()=>$('file').click();
-async function handleFile(f){if(ARC.isArc(f))return ARC.open([f]);const has=f.name.includes('.'),ext=has?f.name.split('.').pop().toLowerCase():'',mt=f.type||'';
+async function handleFile(f){if(ARC.isArc(f))return ARC.open([f]);if(await XV(f))return;const has=f.name.includes('.'),ext=has?f.name.split('.').pop().toLowerCase():'',mt=f.type||'';
  let bk=has&&BIN[ext]||(mt.startsWith('image/')&&mt!=='image/svg+xml'?'image':mt.startsWith('video/')?'video':mt.startsWith('audio/')?'audio':mt==='application/pdf'?'pdf':mt.startsWith('font/')?'font':null);
  if(bk){const label=(ext||mt.split('/')[1]||bk).toUpperCase();commit('',{kind:bk,label,name:f.name,fname:f.name,file:f,url:URL.createObjectURL(f),logo:mk(label,BCOL[bk])});
   render(true);view('prev');return toast('تم رفع ملف '+label)}
